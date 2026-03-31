@@ -34,8 +34,6 @@ void LCD_Proc()
 	// PASS
 	if(lcd_state==2)
 	{
-		PR37=(r37_pass/r37_count)*100;
-		PR38=(r38_pass/r38_count)*100;
 		
 		sprintf((char*)lcd_str, "        PASS        ");
 		LCD_DisplayStringLine(Line1, (uint8_t*)lcd_str);

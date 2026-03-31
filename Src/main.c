@@ -51,8 +51,8 @@
 uint8_t rx_buffer;
 uint8_t rx_state=0;
 unsigned char Buf[3];
-unsigned char r37_buf[20];
-unsigned char r38_buf[20];
+unsigned char r37_buf[40];
+unsigned char r38_buf[40];
 
 /* USER CODE END PV */
 
@@ -133,17 +133,35 @@ int main(void)
 		LED_Proc();
 		KEY_Proc();
 		
+		if(r37_count>0)
+		{
+			PR37=((float)r37_pass*100)/(float)r37_count;
+		}
+		else
+		{
+			PR37=0.0f;
+		}
+		
+		if(r38_count>0)
+		{
+			PR38=((float)r38_pass*100)/(float)r38_count;
+		}
+		else
+		{
+			PR38=0.0f;
+		}
+		
 		if(rx_state==1)
 		{
 			if(Buf[0]=='R'&&Buf[1]=='3'&&Buf[2]=='7')
 			{
-				sprintf((char*)r37_buf,"R37:%d,%d,%.1f%%",r37_count,r37_pass,PR37);
-				HAL_UART_Transmit(&huart1,(uint8_t*)r37_buf,strlen((char*)r37_buf),10);
+				sprintf((char*)r37_buf,"R37:%d,%d,%.1f%%\r\n",r37_count,r37_pass,PR37);
+				HAL_UART_Transmit(&huart1,(uint8_t*)r37_buf,strlen((char*)r37_buf),40);
 			}
 			else if(Buf[0]=='R'&&Buf[1]=='3'&&Buf[2]=='8')
 			{
-				sprintf((char*)r38_buf,"R38:%d,%d,%.1f%%",r38_count,r38_pass,PR38);
-				HAL_UART_Transmit(&huart1,(uint8_t*)r38_buf,strlen((char*)r38_buf),10);
+				sprintf((char*)r38_buf,"R38:%d,%d,%.1f%%\r\n",r38_count,r38_pass,PR38);
+				HAL_UART_Transmit(&huart1,(uint8_t*)r38_buf,strlen((char*)r38_buf),40);
 			}
 			rx_state=0;
 		}
@@ -201,13 +219,13 @@ void SystemClock_Config(void)
 
 float Get_r37()
 {
-	uint32_t adc_value;
+	uint32_t adc_value1;
 	float v37=0.0f;
 	HAL_ADC_Start(&hadc2);
 	if(HAL_ADC_PollForConversion(&hadc2,10)==HAL_OK)
 	{
-		adc_value=HAL_ADC_GetValue(&hadc2);
-		v37=(adc_value/4095)*3.3f;
+		adc_value1=HAL_ADC_GetValue(&hadc2);
+		v37=(adc_value1*3.3f)/4095.0f;
 	}
 	HAL_ADC_Stop(&hadc2);
 	return v37;
@@ -215,13 +233,13 @@ float Get_r37()
 
 float Get_r38()
 {
-	uint32_t adc_value;
+	uint32_t adc_value2;
 	float v38=0.0f;
 	HAL_ADC_Start(&hadc1);
 	if(HAL_ADC_PollForConversion(&hadc1,10)==HAL_OK)
 	{
-		adc_value=HAL_ADC_GetValue(&hadc1);
-		v38=(adc_value/4095)*3.3f;
+		adc_value2=HAL_ADC_GetValue(&hadc1);
+		v38=(adc_value2*3.3f)/4095.0f;
 	}
 	HAL_ADC_Stop(&hadc1);
 	return v38;
